@@ -1,0 +1,84 @@
+<div class="container">
+  <header>
+    <h1>Web IFC Renderer/Viewer</h1>
+  </header>
+
+  <section *ngIf="!ifcurl">
+    <button (click)="fileInput.click()">Select File</button>
+    <input #fileInput type="file" (change)="fileSelected($event)" style="display: none;" />
+    <span *ngIf="isUploading">Uploading File...</span>
+    <p *ngIf="isErrorHappened">{{ loadingMessage }}</p>
+    <p>Due to the closure of Heroku free dyno hosting, the "Select File" and file upload functionality won't be working. Trying to solve it ASAP.</p>
+  </section>
+
+  <section *ngIf="ifcurl">
+    <canvas #c1></canvas> <!-- Ensure this line exists -->
+    <div *ngIf="isLoading">{{ loadingMessage }}...</div>
+  </section>
+
+  <div class="menu">
+    <button (click)="buttonListModalOpen = !buttonListModalOpen">Menu</button>
+    <div *ngIf="buttonListModalOpen">
+      <button (click)="elementListModalOpen = true">Elements List</button>
+      <button (click)="elementDetailsModalOpen = true">Elements Details</button>
+      <button (click)="elementTreeModalOpen = true">Elements Tree</button>
+      <button (click)="metadataModalOpen = true">Metadata Details</button>
+      <button (click)="isControlPanelModalOpen = true">Control Panel</button>
+      <button (click)="searchInputModalOpen = true">Search</button>
+      <button (click)="resetEverything()">Reset Viewer</button>
+      <button (click)="exitViewer()">Exit Viewer</button>
+    </div>
+  </div>
+
+  <app-element-list
+    [types]="ifcService.getFilteredTypes()"
+    [categories]="ifcService.getAllIFCCategories()"
+    [isOpen]="elementListModalOpen"
+    (checkboxChange)="ifcService.toggleCategoryVisibility($event.category, $event.checked, threeJsService.getScene())">
+  </app-element-list>
+
+  <app-element-details
+    [details]="ifcTypesSelectedDetails"
+    [elementIfcType]="elementIfcType"
+    [isOpen]="elementDetailsModalOpen">
+  </app-element-details>
+
+  <app-element-tree
+    [types]="ifcService.getTypes()"
+    [isOpen]="elementTreeModalOpen">
+  </app-element-tree>
+
+  <app-search
+    [searchString]="searchString"
+    [results]="allDetailsForSearch"
+    [errorMessage]="resultErrorMessage"
+    [showLoading]="showSearchLoading"
+    [isOpen]="searchInputModalOpen"
+    (search)="searchFunction($event)">
+  </app-search>
+
+  <app-metadata
+    [ifcFileName]="ifcFileName"
+    [ifcApplication]="IFCAPPLICATION"
+    [ifcOrganization]="IFCORGANIZATION"
+    [ifcPostalAddress]="IFCPOSTALADDRESS"
+    [ifcTelecomAddress]="IFCTELECOMADDRESS"
+    [ifcPerson]="IFCPERSON"
+    [isOpen]="metadataModalOpen">
+  </app-metadata>
+
+  <app-control-panel
+    [isBasePlaneOn]="isBasePlaneOn"
+    [isAxesHelperOn]="isAxesHelperOn"
+    [isLiveDetailsOn]="isLiveDetailsOn"
+    [isOpen]="isControlPanelModalOpen"
+    (controlChange)="controlChange($event)"
+    (fullScreen)="fullScreen()">
+  </app-control-panel>
+
+  <div *ngIf="liveDetailsModal" class="live-details">
+    <h3>Live Details</h3>
+    <p>Type: {{ hoveredObjectType?.type }}</p>
+    <p>Express ID: {{ hoveredObjectType?.expressId }}</p>
+  </div>
+</div>

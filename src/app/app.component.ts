@@ -1,8 +1,8 @@
-import {Component} from '@angular/core';
+import { Component } from '@angular/core';
+import { EngineComponent } from './components/engine/engine.component';
 
 @Component({
   selector: 'app-root',
-  templateUrl: './app.component.html'
+  template: `<app-engine></app-engine>`,
 })
-export class AppComponent {
-}
+export class AppComponent {}
